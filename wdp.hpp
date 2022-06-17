@@ -41,6 +41,7 @@ namespace wdp {
 
         friend std::ostream& operator<<(std::ostream& os, const Bundle& b);
         friend auto generate_bundles(int n_biders, int n_items, auto& prices);
+        friend class Subset;
 
     public: 
         int get_price() { return price; }
@@ -82,23 +83,31 @@ namespace wdp {
         Bitset bundles;
         int price = 0;
 
-        Subset() : bundles(0) {}
         Subset(size_t size, uint64_t bits, auto& full_set) : bundles(size, bits) {
             // calculate subset price
             for (int i = 0; i < size; ++i)
                 if (bundles[i]) price += full_set[i].get_price();
         }
 
-        // implement this
-        bool is_feasible() {
-            for 
-        }
-        
-        friend auto enumerate_bundle_subsets(auto& bundles);
-        friend std::ostream& operator<<(std::ostream& os, const Subset& s);
-        friend Subset find_best(auto& subsets);
-
     public:
+         friend auto enumerate_bundle_subsets(auto& bundles);
+        friend std::ostream& operator<<(std::ostream& os, const Subset& s);
+        friend Subset find_best(auto& subsets, auto& full_set);
+
+        // checks if bundles in subset don't have items in common
+        bool is_feasible(auto& full_set) {
+            for (size_t i = 0; i < bundles.size(); ++i)
+                for (size_t j = 0; j < bundles.size(); ++j) {
+                    if (bundles[i] == false) continue;
+                    if (bundles[j] == false) continue;
+                    if (i == j) continue;
+                    Bundle& a = full_set[i];
+                    Bundle& b = full_set[j];
+                    if (a.items.intersects(b.items)) return false;
+                }
+            return true;
+        }
+
         int get_price() { return price; }
     };
 
@@ -107,14 +116,8 @@ namespace wdp {
         os << s.bundles;
         return os;
     }
-    
-    
 
-
-    // implement one of these algorithms
-    // https://math.stackexchange.com/a/349225
     // https://math.stackexchange.com/a/349253
-    // https://math.stackexchange.com/a/89453
     auto enumerate_bundle_subsets(auto& bundles) {
         auto n = bundles.size();
         auto subsets = std::vector<Subset>();
@@ -131,12 +134,12 @@ namespace wdp {
     }
 
 
-    Subset find_best(auto& subsets) {
+    Subset find_best(auto& subsets, auto& full_set) {
         Subset* best = nullptr;
         int best_price = 0;
 
         for (auto& s : subsets) {
-            if (s.is_feasible() && s.get_price() > best_price) {
+            if (s.is_feasible(full_set) && s.get_price() > best_price) {
                 best = &s;
                 best_price = s.get_price();
             }
