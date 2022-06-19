@@ -23,5 +23,11 @@
     <ClInclude Include="wdp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ui.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

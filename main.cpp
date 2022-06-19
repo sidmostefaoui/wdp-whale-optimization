@@ -1,29 +1,21 @@
 #include <iostream>
 #include <cassert>
 #include "wdp.hpp"
+#include "ui.hpp"
 
-/* TODO 
-    - change random distribution in generating bundles
-*/
+
 int main()
 {
-    int n_items = 50;
-    int n_biders = 22;
+    int n_items = 10;
+    int n_biders = 10;
 
     auto prices = wdp::generate_prices(n_items);
-
     auto bundles = wdp::generate_bundles(n_biders, n_items, prices);
+    auto best = wdp::solve::brute_force(bundles);
+    auto [bitset, price] = wdp::solve::whale_optimization(bundles, 1000000);
 
-    auto subsets = wdp::enumerate_bundle_subsets(bundles);
-    auto best = wdp::find_best(subsets, bundles);
-
-    std::cout << "N ITEMS = " << n_items << " \n";
-    std::cout << "N BIDERS = " << n_biders << " \n";
-    std::cout << "N SUBSETS = " << subsets.size() << "\n";
-
-   // for (auto& s : subsets)
-     //   std::cout << s << " feasible: " << s.is_feasible(bundles) << " " << s.get_price() << "$\n";
-
-
-    std::cout << "BEST = " << best << "\n";
+    std::cout << "best brute: " << best << " " << best.get_price() << "$\n";
+    std::cout << "best woa: " << bitset << " " << price << "$\n";
+    
+    ui::draw();
 }
