@@ -41,20 +41,11 @@ public:
             if (items[i]) price += prices[i];
     };
 
-    friend std::ostream& operator<<(std::ostream& os, const Bundle& b);
     friend auto generate_bundles(int n_biders, int n_items, auto& prices);
-    friend class Subset;
 
     int get_price() { return price; }
         
 };
-
-
-std::ostream& operator<<(std::ostream& os, const Bundle& b)
-{
-    os << b.items;
-    return os;
-}
 
 auto generate_prices(int n_items) {
     auto prices = std::vector<int>();
@@ -134,7 +125,7 @@ auto brute_force(auto& bundles) {
 
     t.end();
 
-    return std::make_tuple(*best_subset, *best_price, t.ms());
+    return std::tuple(*best_subset, *best_price, t.ms());
 }
 
 struct Whale {
@@ -144,7 +135,7 @@ struct Whale {
     void calculate_fitness(std::vector<Bundle>& bundles) {
         auto subset = Bitset(bundles.size(), pos);
 
-        auto calc_price = [](Bitset subset, std::vector<Bundle>& bundles) {
+        static auto calc_price = [&]() {
             auto price = 0;
             for (size_t i = 0; i < subset.size(); ++i)
                 if (subset[i]) price += bundles[i].get_price();
@@ -152,7 +143,7 @@ struct Whale {
         };
 
         if (!subset_is_feasible(subset, bundles)) fitness = 0;
-        else fitness = calc_price(subset, bundles);
+        else fitness = calc_price();
     }
 };
 
@@ -244,7 +235,7 @@ auto whale_optimization(std::vector<Bundle>& bundles, int MAX_ITERATIONS) {
     }
             
     timer.end();
-    return std::make_tuple(Bitset(bundles.size(), best.pos), best.fitness, timer.ms());
+    return std::tuple(Bitset(bundles.size(), best.pos), best.fitness, timer.ms());
 }
 
 }
