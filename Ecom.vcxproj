@@ -177,7 +177,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="wdp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="util.hpp" />
